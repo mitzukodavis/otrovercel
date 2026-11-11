@@ -1,13 +1,12 @@
-# Jam Vercel — buscador integrado sin API Key
+# Jam Vercel — Buscador oficial YouTube Data API v3
 
-Esta versión reemplaza el buscador basado en instancias públicas de Invidious por **youtubei.js**, cliente no oficial de YouTube. La búsqueda se realiza desde la ruta `/api/search` de Next.js y devuelve hasta diez videos con título, canal y miniatura. Los invitados pueden añadirlos a la cola directamente.
+Configura en Vercel > proyecto otrovercel > Settings > Environment Variables:
 
-## Despliegue
+- `YOUTUBE_API_KEY`: clave nueva de Google Cloud (Secret, Production y Preview). **No se incluye en este ZIP**.
+- Conserva las variables de Vercel Blob existentes.
 
-1. Sube los archivos de este ZIP a GitHub, reemplazando los anteriores.
-2. En Vercel, despliega el proyecto Next.js; Vercel instalará las dependencias desde `package.json`.
-3. Conserva la conexión existente de Vercel Blob. No hace falta `YOUTUBE_API_KEY`.
+Habilita YouTube Data API v3 en Google Cloud y restringe la clave a esta API. Después de guardar la variable, despliega de nuevo el proyecto.
 
-Se conservan las funciones existentes: salas compartidas, lista, historial, arrastrar y soltar, extracción de títulos y crossfade.
+El buscador obtiene hasta 15 videos con **una sola consulta**, muestra 3 y permite mostrar otros 3 sin nuevas consultas. Se cachean consultas idénticas en memoria por 6 horas (caché no garantizada entre instancias ni despliegues). Cada búsqueda nueva cuesta 100 unidades de cuota, independientemente de si devuelve 3 o 15 resultados. Google normalmente asigna 10 000 unidades diarias por proyecto; otras operaciones también consumen cuota. No se ha implementado un límite diario global estricto.
 
-**Advertencia:** `youtubei.js` es un cliente no oficial. YouTube puede cambiar sus mecanismos o restringir las consultas, de modo que no se garantiza disponibilidad permanente. Respeta las condiciones de uso de YouTube. La funcionalidad no se ha probado en un despliegue real de Vercel.
+La clave queda únicamente en el servidor. Se conservan reproducción, historial, drag-and-drop y demás funcionalidades del proyecto anterior.
