@@ -1,0 +1,1 @@
+Carrusel lateral: video actual a la izquierda y siguiente a la derecha. Al comenzar el siguiente se desplaza a la izquierda; compatible con pantalla completa. Dos reproductores YouTube para crossfade de audio. Nota: el reproductor secundario puede mostrar una pantalla de preparación antes de comenzar; YouTube limita algunas reproducciones.
