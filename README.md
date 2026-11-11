@@ -10,3 +10,6 @@ Habilita YouTube Data API v3 en Google Cloud y restringe la clave a esta API. De
 El buscador obtiene hasta 15 videos con **una sola consulta**, muestra 3 y permite mostrar otros 3 sin nuevas consultas. Se cachean consultas idénticas en memoria por 6 horas (caché no garantizada entre instancias ni despliegues). Cada búsqueda nueva cuesta 100 unidades de cuota, independientemente de si devuelve 3 o 15 resultados. Google normalmente asigna 10 000 unidades diarias por proyecto; otras operaciones también consumen cuota. No se ha implementado un límite diario global estricto.
 
 La clave queda únicamente en el servidor. Se conservan reproducción, historial, drag-and-drop y demás funcionalidades del proyecto anterior.
+
+## Video visible y pantalla completa
+El reproductor anfitrión mantiene visible la capa de YouTube de la canción activa y oculta visualmente la capa de precarga del crossfade. El botón «Pantalla completa» usa Fullscreen API del navegador y permite volver a la vista normal. El navegador puede requerir interacción del usuario para entrar a pantalla completa.
