@@ -23,7 +23,8 @@ export default function Page(){const [activeView,setActiveView]=useState(0),[sli
  useEffect(()=>{roomRef.current=room},[room]);useEffect(()=>{keyRef.current=key},[key]);
  useEffect(()=>{if(!code)return;return watchRoom(code,data=>{
   if(!data){setMsg('Sala no encontrada');setRoom(null);return;}
-  const r=data as Room & {hostSeen?:number};
+  const raw=data as Room & {hostSeen?:number};
+  const r={...raw,queue:Array.isArray(raw.queue)?raw.queue:[],history:Array.isArray(raw.history)?raw.history:[],index:Number.isInteger(raw.index)?raw.index:0};
   setRoom({...r,hostOnline:Date.now()-(r.hostSeen||0)<25000});setMsg('');
  },error=>setMsg('No se pudo sincronizar Firebase: '+error))},[code]);
  useEffect(()=>{if(!code||!key)return;const t=setInterval(()=>{api('/api/room/action',{code,hostKey:key,action:'heartbeat'}).catch(()=>{})},12000);return()=>clearInterval(t)},[code,key]);

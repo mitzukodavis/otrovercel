@@ -2,15 +2,21 @@ import {getDatabase} from './firebase-admin';
 export type Video={id:string;title:string;addedBy:string;uid:string;embedStatus?:'allowed'|'blocked'|'unknown';embedReason?:string};
 export type PlayedVideo=Video & {playedAt:number};
 export type Room={code:string;history?:PlayedVideo[];queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
+export function normalizeRoom(value:any):Room{
+ return {...value,queue:Array.isArray(value?.queue)?value.queue:[],history:Array.isArray(value?.history)?value.history:[],index:Number.isInteger(value?.index)?value.index:0,playing:value?.playing===true,hostSeen:Number(value?.hostSeen)||0};
+}
+export function cleanFirebase<T>(value:T):T{
+ return JSON.parse(JSON.stringify(value)) as T;
+}
 export function valid(code:string){return /^[A-Z0-9]{6}$/.test(code)}
 export async function readRoom(code:string):Promise<Room|null>{
  if(!valid(code))return null;
- const [snap,key]=await Promise.all([getDatabase().ref('rooms/'+code).get(),getDatabase().ref('hostKeys/'+code).get()]);return snap.exists()?{...snap.val(),hostKey:key.val()||''} as Room:null;
+ const [snap,key]=await Promise.all([getDatabase().ref('rooms/'+code).get(),getDatabase().ref('hostKeys/'+code).get()]);return snap.exists()?normalizeRoom({...snap.val(),hostKey:key.val()||''}):null;
 }
 export async function createRoom(room:Room):Promise<boolean>{
  const ref=getDatabase().ref('rooms/'+room.code);
  const {hostKey,...publicRoom}=room;
- const result=await ref.transaction(current=>current===null?{...publicRoom,updatedAt:Date.now(),version:1}:undefined,undefined,false);
+ const result=await ref.transaction(current=>current===null?cleanFirebase({...publicRoom,updatedAt:Date.now(),version:1}):undefined,undefined,false);
  if(result.committed)await getDatabase().ref('hostKeys/'+room.code).set(hostKey);
  return result.committed;
 }
@@ -20,9 +26,9 @@ export async function mutateRoom(code:string,mutate:(room:Room)=>Room|undefined)
  const hostKey=String(keySnap.val()||'');
  const result=await ref.transaction(current=>{
   if(!current)return undefined;
-  const next=mutate({...current,hostKey} as Room);if(!next)return undefined;
+  const next=mutate(normalizeRoom({...current,hostKey}));if(!next)return undefined;
   next.updatedAt=Date.now();next.version=(next.version||0)+1;
-  const {hostKey:_privateKey,...publicRoom}=next;return publicRoom;
+  const {hostKey:_privateKey,...publicRoom}=next;return cleanFirebase(publicRoom);
  },undefined,false);
  return result.committed;
 }
