@@ -13,3 +13,7 @@ La clave queda únicamente en el servidor. Se conservan reproducción, historial
 
 ## Video visible y pantalla completa
 El reproductor anfitrión mantiene visible la capa de YouTube de la canción activa y oculta visualmente la capa de precarga del crossfade. El botón «Pantalla completa» usa Fullscreen API del navegador y permite volver a la vista normal. El navegador puede requerir interacción del usuario para entrar a pantalla completa.
+
+
+## Carrusel en pantalla completa
+El mismo contenedor `.screen` entra en pantalla completa, manteniendo los dos reproductores montados y la animación deslizante del carrusel durante la transición. Se utiliza todo el espacio disponible (16:9 en pantallas Full HD). La resolución real del video depende de YouTube, de la calidad del video original, de la conexión y del navegador; no se puede forzar 1080p desde la IFrame API.

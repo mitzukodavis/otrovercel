@@ -1,0 +1,19 @@
+JAM VERCEL - REPRODUCTOR CARRUSEL
+
+Problema solucionado:
+La API IFrame de YouTube sustituye el div que se le pasa por un iframe.
+Antes se pasaba el div que llevaba las clases yt-active / yt-standby, por
+lo que React ya no podia controlar de forma fiable la visibilidad del video.
+
+Solucion:
+- Cada iframe ahora vive dentro de una tarjeta contenedora persistente.
+- Las clases de visibilidad y la animacion se aplican a la tarjeta, no al iframe.
+- Cuando YouTube confirma que el segundo video empieza (estado PLAYING),
+  la tarjeta entrante se desliza al frente como un carrusel.
+- Cuando el servidor confirma la nueva cancion, se actualiza el reproductor
+  activo y se detiene el anterior.
+- Mantiene crossfade, pantalla completa, busqueda oficial, historial, drag.
+
+NOTA: YouTube puede limitar la reproduccion simultanea de dos videos;
+la continuidad perfecta no puede garantizarse en todos los navegadores.
+No incluyas la clave API en este ZIP; se lee de YOUTUBE_API_KEY en Vercel.
