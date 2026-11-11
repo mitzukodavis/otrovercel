@@ -10,4 +10,30 @@ export async function readRoom(code:string):Promise<Room|null>{
  return await r.json() as Room;
 }
 export async function writeRoom(room:Room){room.updatedAt=Date.now();room.version=(room.version||0)+1;await put(path(room.code),JSON.stringify(room),{access:'public',addRandomSuffix:false,allowOverwrite:true,contentType:'application/json'});}
-export function parseIds(input:string):string[]{const found:string[]=[];for(const item of input.split(/[\s,]+/)){if(!item)continue;try{const u=new URL(item);let id='';if(['youtu.be','www.youtu.be'].includes(u.hostname))id=u.pathname.split('/')[1];else if(['youtube.com','www.youtube.com','m.youtube.com','music.youtube.com'].includes(u.hostname)){id=u.searchParams.get('v')||'';if(!id&&u.pathname.startsWith('/shorts/'))id=u.pathname.split('/')[2];if(!id&&u.pathname.startsWith('/live/'))id=u.pathname.split('/')[2];}if(/^[a-zA-Z0-9_-]{11}$/.test(id)&&!found.includes(id))found.push(id)}catch{if(/^[a-zA-Z0-9_-]{11}$/.test(item)&&!found.includes(item))found.push(item)}}return found.slice(0,40)}
+export function parseIds(input:string):string[]{
+ const found:string[]=[];
+ // Admit URLs pasted with commas, newlines, surrounding punctuation and plain IDs.
+ for(const raw of input.split(/[\s,]+/)){
+  const item=raw.trim().replace(/^[<('"\[]+|[>)'"\].;]+$/g,'');
+  if(!item)continue;
+  let id='';
+  if(/^[a-zA-Z0-9_-]{11}$/.test(item))id=item;
+  else try{
+   const u=new URL(/^https?:\/\//i.test(item)?item:'https://'+item);
+   const host=u.hostname.toLowerCase().replace(/^www\./,'');
+   const parts=u.pathname.split('/').filter(Boolean);
+   if(host==='youtu.be')id=parts[0]||'';
+   else if(['youtube.com','m.youtube.com','music.youtube.com','youtube-nocookie.com'].includes(host)){
+    if(parts[0]==='watch')id=u.searchParams.get('v')||'';
+    else if(['shorts','live','embed','v'].includes(parts[0]))id=parts[1]||'';
+    else if(parts[0]==='attribution_link'){
+     const inner=u.searchParams.get('u')||u.searchParams.get('url')||'';
+     const innerUrl=new URL(inner,'https://www.youtube.com');id=innerUrl.searchParams.get('v')||'';
+    }
+    else id=u.searchParams.get('v')||'';
+   }
+  }catch{}
+  if(/^[a-zA-Z0-9_-]{11}$/.test(id)&&!found.includes(id))found.push(id);
+ }
+ return found.slice(0,40);
+}

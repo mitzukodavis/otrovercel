@@ -27,3 +27,12 @@
 - Los JSON de sala son públicos y los enlaces de sala no son secretos. No guardes datos privados.
 - Se realizan lecturas y escrituras en Blob y Vercel, sujetas a cuotas de tu plan.
 - No soporta importar una playlist completa con un único URL de playlist; sí muchos enlaces individuales.
+
+REPRODUCCION: Los videos comienzan en el segundo 3. Al terminar un video, el anfitrion avanza automaticamente al siguiente. YouTube puede bloquear autoplay hasta que el anfitrion interactue con la pagina.
+
+## Actualización: enlaces de YouTube
+- Los invitados ven primero el formulario para agregar enlaces.
+- Se admiten watch, youtu.be, shorts, live, embed, YouTube Music, youtube-nocookie y IDs de 11 caracteres.
+- Los parámetros de seguimiento, tiempos y listas no cambian el ID.
+- Se evitan IDs duplicados en la misma sala.
+- Los cambios de cola se comparten usando el almacenamiento Vercel Blob existente.
