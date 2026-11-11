@@ -1,16 +1,31 @@
-import { list, put } from '@vercel/blob';
+import {getDatabase} from './firebase-admin';
 export type Video={id:string;title:string;addedBy:string;uid:string;embedStatus?:'allowed'|'blocked'|'unknown';embedReason?:string};
 export type PlayedVideo=Video & {playedAt:number};
 export type Room={code:string;history?:PlayedVideo[];queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
-const path=(code:string)=>`jam-rooms/${code}.json`;
 export function valid(code:string){return /^[A-Z0-9]{6}$/.test(code)}
 export async function readRoom(code:string):Promise<Room|null>{
- const {blobs}=await list({prefix:path(code),limit:100});
- const blob=blobs.find(b=>b.pathname===path(code));if(!blob)return null;
- const r=await fetch(blob.url+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('No se pudo leer la sala');
- return await r.json() as Room;
+ if(!valid(code))return null;
+ const [snap,key]=await Promise.all([getDatabase().ref('rooms/'+code).get(),getDatabase().ref('hostKeys/'+code).get()]);return snap.exists()?{...snap.val(),hostKey:key.val()||''} as Room:null;
 }
-export async function writeRoom(room:Room){room.updatedAt=Date.now();room.version=(room.version||0)+1;await put(path(room.code),JSON.stringify(room),{access:'public',addRandomSuffix:false,allowOverwrite:true,contentType:'application/json'});}
+export async function createRoom(room:Room):Promise<boolean>{
+ const ref=getDatabase().ref('rooms/'+room.code);
+ const {hostKey,...publicRoom}=room;
+ const result=await ref.transaction(current=>current===null?{...publicRoom,updatedAt:Date.now(),version:1}:undefined,undefined,false);
+ if(result.committed)await getDatabase().ref('hostKeys/'+room.code).set(hostKey);
+ return result.committed;
+}
+export async function mutateRoom(code:string,mutate:(room:Room)=>Room|undefined):Promise<boolean>{
+ const ref=getDatabase().ref('rooms/'+code);
+ const keySnap=await getDatabase().ref('hostKeys/'+code).get();
+ const hostKey=String(keySnap.val()||'');
+ const result=await ref.transaction(current=>{
+  if(!current)return undefined;
+  const next=mutate({...current,hostKey} as Room);if(!next)return undefined;
+  next.updatedAt=Date.now();next.version=(next.version||0)+1;
+  const {hostKey:_privateKey,...publicRoom}=next;return publicRoom;
+ },undefined,false);
+ return result.committed;
+}
 export function parseIds(input:string):string[]{
  const found:string[]=[];
  // Admit URLs pasted with commas, newlines, surrounding punctuation and plain IDs.
