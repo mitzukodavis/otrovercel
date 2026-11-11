@@ -1,21 +1,29 @@
-# Jam Vercel (sin Storage)
+# Jam Vercel — cola compartida para YouTube
 
-Aplicación Next.js que reproduce una cola de videos de YouTube.
+## Qué hace
 
-## Despliegue
+- Una PC anfitriona reproduce los videos de YouTube conectada a los parlantes.
+- Los invitados entran al enlace de la sala y agregan videos desde cualquier dispositivo.
+- La cola se actualiza automáticamente cada ~2 segundos.
+- Solo la PC que creó la sala controla reproducción, saltos y eliminación.
+- Al terminar un video, el reproductor intenta pasar al siguiente.
 
-1. Sube los archivos de esta carpeta (no el ZIP) a la raíz de un repositorio GitHub.
-2. En https://vercel.com/new importa el repositorio.
-3. Framework: Next.js. Pulsa Deploy.
-4. No necesitas variables de entorno, Blob ni base de datos.
+## Publicar en Vercel
 
-## Uso
+1. Descomprime el ZIP y sube **el contenido** a la raíz de un repositorio de GitHub.
+2. Importa ese repositorio en Vercel, con Framework Next.js.
+3. En el proyecto Vercel, abre Storage y conecta tu Vercel Blob Store (Production).
+4. Vuelve a desplegar el proyecto **después** de conectar Blob.
+5. Abre la web, crea una sala en la PC que reproduce música y comparte el enlace.
 
-- Pega uno o varios enlaces de YouTube, uno por línea.
-- Reproduce, pausa, salta, reordena y elimina videos.
-- La lista se conserva en localStorage en ese navegador.
-- Compartir lista genera una URL con los IDs de video para abrir una copia en otro dispositivo.
+**Conexión Blob moderna:** Vercel puede utilizar OIDC y variables BLOB_STORE_ID sin BLOB_READ_WRITE_TOKEN. Este proyecto usa @vercel/blob en funciones del servidor, que resuelve la autenticación del entorno Vercel. No agregues tokens al código ni variables NEXT_PUBLIC_ para credenciales.
 
-## Limitaciones
+## Límites y consideraciones
 
-No hay salas multiusuario sincronizadas: para eso hace falta un backend compartido (base de datos o servicio de sincronización). Un enlace compartido es una instantánea de la lista. El navegador puede exigir interacción del usuario para reproducir audio. Algunos videos no permiten incrustación.
+- El navegador puede requerir un clic en **Reproducir** para activar audio. YouTube puede bloquear algunos videos incrustados.
+- La PC anfitriona debe permanecer abierta. Si cierra su pestaña, la cola permanece en Blob pero nadie reproduce.
+- La sincronización de la cola es por consulta cada 2.2 segundos; no son WebSockets.
+- Para grupos pequeños: Blob es almacenamiento de objetos, no una base de datos transaccional. Agregados exactamente simultáneos pueden sobrescribirse (última escritura gana). Para uso masivo sería mejor un almacén con operaciones atómicas.
+- Los JSON de sala son públicos y los enlaces de sala no son secretos. No guardes datos privados.
+- Se realizan lecturas y escrituras en Blob y Vercel, sujetas a cuotas de tu plan.
+- No soporta importar una playlist completa con un único URL de playlist; sí muchos enlaces individuales.
