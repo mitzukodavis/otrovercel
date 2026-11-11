@@ -30,8 +30,12 @@ export async function mutateRoom(code:string,mutate:(room:Room)=>Room|undefined)
  const before=await ref.get();
  if(!before.exists())throw new Error('ROOM_NOT_FOUND: '+code);
  const result=await ref.transaction(current=>{
-  if(!current)return undefined;
-  const next=mutate(normalizeRoom({...current,hostKey}));if(!next)return undefined;
+  // Firebase Admin transactions can invoke the updater with an initially uncached null.
+  // Seed the first attempt from the server snapshot; Firebase checks the server hash
+  // and retries with the latest value if another writer changed it.
+  const source=current===null?before.val():current;
+  if(!source)return undefined;
+  const next=mutate(normalizeRoom({...source,hostKey}));if(!next)return undefined;
   next.updatedAt=Date.now();next.version=(next.version||0)+1;
   const {hostKey:_privateKey,...publicRoom}=next;return cleanFirebase(publicRoom);
  },undefined,false);

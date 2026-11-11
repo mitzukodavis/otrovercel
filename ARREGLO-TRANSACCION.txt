@@ -1,0 +1,1 @@
+Corrige la transacción cancelada: Firebase Admin puede iniciar el callback con null aunque la sala exista. Se usa la lectura previa como valor inicial; Firebase reintenta si hay cambios concurrentes. No requiere cambios en variables ni reglas.
