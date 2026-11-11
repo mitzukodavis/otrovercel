@@ -45,3 +45,16 @@ REPRODUCCION: Los videos comienzan en el segundo 3. Al terminar un video, el anf
 - Las salas creadas antes de esta actualización funcionan: el historial se inicializa al finalizar la primera canción.
 - Las canciones eliminadas manualmente antes de reproducirse no se añaden al historial.
 - El historial no contiene canciones reproducidas antes de instalar esta versión.
+
+## Novedades: crossfade y búsqueda de YouTube
+
+- Dos reproductores de YouTube intentan solapar los últimos **5 segundos** de una canción con los primeros **5 segundos** de la siguiente, subiendo/bajando volumen. El anfitrión mantiene la reproducción y el historial.
+- La duración se lee de la IFrame API (`getDuration`, `getCurrentTime`), sin clave adicional.
+- En anfitrión e invitados aparece **Buscar canciones en YouTube**. El popup muestra hasta 10 resultados y permite añadir uno a la cola.
+- **CONFIGURACIÓN OBLIGATORIA PARA EL BUSCADOR**: habilitar *YouTube Data API v3* en Google Cloud, crear una API key, y añadirla en Vercel > Project > Settings > Environment Variables como `YOUTUBE_API_KEY` (Production/Preview). Redeploy después.
+- El crossfade es best-effort: el buffering, autoplay y las restricciones de incrustación de YouTube pueden interrumpir o bloquear mezclas. No es posible garantizar transiciones perfectas en todos los navegadores y videos. Los videos en vivo no tienen una duración final predecible.
+
+
+## Buscador sin clave de API
+
+El buscador emergente usa instancias públicas de Invidious desde `/api/search` y presenta hasta 10 videos, con botón Agregar a la cola. No requiere YOUTUBE_API_KEY. Las instancias públicas son externas y pueden dejar de funcionar o bloquear solicitudes; como alternativa siempre puedes pegar enlaces. No se incrusta youtube.com, ya que YouTube impide incrustar su página de búsqueda en un iframe.
