@@ -51,6 +51,6 @@ export async function POST(req:NextRequest){try{
 
  return room;
  });
- if(!committed)return NextResponse.json({error:error||'No se pudo actualizar la sala'},{status:409});
+ if(!committed){console.warn('[Jam action] rejected',{code,action,reason:error||'transaction not committed'});return NextResponse.json({error:error||'No se pudo actualizar la sala (transacción cancelada)',code,action},{status:409});}
  return NextResponse.json({ok:true});
- }catch(e){return NextResponse.json({error:'No se pudo actualizar la lista',detail:String(e)},{status:500})}}
+ }catch(e){console.error('[Jam action] Firebase error',e);return NextResponse.json({error:'No se pudo actualizar la lista',detail:String(e)},{status:500})}}

@@ -3,8 +3,10 @@ export type Video={id:string;title:string;addedBy:string;uid:string;embedStatus?
 export type PlayedVideo=Video & {playedAt:number};
 export type Room={code:string;history?:PlayedVideo[];queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
 export function normalizeRoom(value:any):Room{
- return {...value,queue:Array.isArray(value?.queue)?value.queue:[],history:Array.isArray(value?.history)?value.history:[],index:Number.isInteger(value?.index)?value.index:0,playing:value?.playing===true,hostSeen:Number(value?.hostSeen)||0};
+ const asList=(v:any):any[]=>Array.isArray(v)?v:v&&typeof v==='object'?Object.keys(v).sort((a,b)=>Number(a)-Number(b)).map(k=>v[k]).filter(Boolean):[];
+ return {...value,queue:asList(value?.queue),history:asList(value?.history),index:Number.isInteger(value?.index)?value.index:0,playing:value?.playing===true,hostSeen:Number(value?.hostSeen)||0};
 }
+
 export function cleanFirebase<T>(value:T):T{
  return JSON.parse(JSON.stringify(value)) as T;
 }
@@ -24,12 +26,19 @@ export async function mutateRoom(code:string,mutate:(room:Room)=>Room|undefined)
  const ref=getDatabase().ref('rooms/'+code);
  const keySnap=await getDatabase().ref('hostKeys/'+code).get();
  const hostKey=String(keySnap.val()||'');
+ // Preload remote state: otherwise an initial locally uncached null may abort the transaction.
+ const before=await ref.get();
+ if(!before.exists())throw new Error('ROOM_NOT_FOUND: '+code);
  const result=await ref.transaction(current=>{
   if(!current)return undefined;
   const next=mutate(normalizeRoom({...current,hostKey}));if(!next)return undefined;
   next.updatedAt=Date.now();next.version=(next.version||0)+1;
   const {hostKey:_privateKey,...publicRoom}=next;return cleanFirebase(publicRoom);
  },undefined,false);
+ if(!result.committed){
+  const after=await ref.get();
+  console.warn('[Jam Firebase] Transaction not committed', {code,exists:after.exists(),version:after.val()?.version});
+ }
  return result.committed;
 }
 export function parseIds(input:string):string[]{

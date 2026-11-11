@@ -1,0 +1,9 @@
+CAMBIOS FIREBASE: COLA E HISTORIAL
+- Se normalizan queue e history tanto si Firebase devuelve arreglos como objetos indexados.
+- Se precarga el estado de la sala antes de la transaccion de actualizacion para evitar abortos por estado local no inicializado.
+- Las transacciones canceladas dejan un registro diagnostico en Vercel Logs.
+- El buscador muestra mensajes de error del servidor mas detallados.
+- La interfaz indica las rutas Firebase rooms/CODIGO/queue y rooms/CODIGO/history.
+- Firebase elimina arreglos vacios: queue y history solo aparecen tras agregarse la primera cancion o registrarse la primera reproduccion, respectivamente.
+- No es necesario modificar reglas ni credenciales para esta actualizacion.
+IMPORTANTE: Compilacion completa no verificada en este entorno.
