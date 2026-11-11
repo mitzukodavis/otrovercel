@@ -1,6 +1,7 @@
 import { list, put } from '@vercel/blob';
 export type Video={id:string;title:string;addedBy:string;uid:string};
-export type Room={code:string;queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
+export type PlayedVideo=Video & {playedAt:number};
+export type Room={code:string;history?:PlayedVideo[];queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
 const path=(code:string)=>`jam-rooms/${code}.json`;
 export function valid(code:string){return /^[A-Z0-9]{6}$/.test(code)}
 export async function readRoom(code:string):Promise<Room|null>{
@@ -36,4 +37,17 @@ export function parseIds(input:string):string[]{
   if(/^[a-zA-Z0-9_-]{11}$/.test(id)&&!found.includes(id))found.push(id);
  }
  return found.slice(0,40);
+}
+
+// YouTube oEmbed returns public video titles without an API key.
+// Some videos do not expose oEmbed metadata (private, age restricted, unavailable).
+export async function getYouTubeTitle(id:string):Promise<string|null>{
+ if(!/^[a-zA-Z0-9_-]{11}$/.test(id))return null;
+ try{
+  const url='https://www.youtube.com/oembed?url='+encodeURIComponent('https://www.youtube.com/watch?v='+id)+'&format=json';
+  const response=await fetch(url,{signal:AbortSignal.timeout(4500),next:{revalidate:3600}});
+  if(!response.ok)return null;
+  const data=await response.json() as {title?:unknown};
+  return typeof data.title==='string'&&data.title.trim()?data.title.trim().slice(0,180):null;
+ }catch{return null}
 }

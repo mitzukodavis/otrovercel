@@ -36,3 +36,12 @@ REPRODUCCION: Los videos comienzan en el segundo 3. Al terminar un video, el anf
 - Los parámetros de seguimiento, tiempos y listas no cambian el ID.
 - Se evitan IDs duplicados en la misma sala.
 - Los cambios de cola se comparten usando el almacenamiento Vercel Blob existente.
+
+
+## Historial de reproducción (nueva función)
+- Cuando termina una canción o el anfitrión pulsa «Siguiente», se retira de la cola y pasa al historial con fecha y hora.
+- Si el anfitrión elige otra canción mientras está reproduciendo, la canción anterior pasa al historial.
+- El historial aparece para todos los participantes y se guarda en Vercel Blob, incluso al vaciar la cola.
+- Las salas creadas antes de esta actualización funcionan: el historial se inicializa al finalizar la primera canción.
+- Las canciones eliminadas manualmente antes de reproducirse no se añaden al historial.
+- El historial no contiene canciones reproducidas antes de instalar esta versión.

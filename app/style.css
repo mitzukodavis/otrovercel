@@ -3,3 +3,6 @@
 .item[draggable="true"]{cursor:grab;touch-action:pan-y}.item.dragging{opacity:.4}.item.drag-over{outline:2px dashed #a78bfa;outline-offset:-3px}.draghandle{border:0;background:transparent;color:#bba6ff;font-size:22px;cursor:grab;padding:4px 7px;align-self:center}.draghelp{color:#aaa3b9;font-size:12px;margin:10px 0}.item:focus-within{outline:1px solid #a78bfa}
 
 .guest-add-top{margin-bottom:18px}.guest-add-top h2{margin-top:3px}.guest-add-top .line{margin-bottom:16px}
+
+/* Historial completo, visible para anfitrión e invitados */
+.history-panel{grid-column:1/-1}.history-panel .item{max-width:100%}.history-panel .item img{flex-shrink:0}
