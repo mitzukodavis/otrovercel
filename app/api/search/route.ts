@@ -1,9 +1,10 @@
+import {checkVideos} from '../../../lib/youtube';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-type Video = { id: string; title: string; channel: string; thumbnail: string };
+type Video = { id: string; title: string; channel: string; thumbnail: string; embedStatus?:string; embedReason?:string };
 type CacheEntry = { items: Video[]; expires: number };
 const cache = new Map<string, CacheEntry>();
 const CACHE_MS = 6 * 60 * 60 * 1000;
@@ -33,6 +34,9 @@ export async function GET(req: NextRequest) {
       if (typeof id !== 'string' || !/^[a-zA-Z0-9_-]{11}$/.test(id)) return [];
       return [{ id, title: entry.snippet?.title || `Video ${id}`, channel: entry.snippet?.channelTitle || 'YouTube', thumbnail: entry.snippet?.thumbnails?.medium?.url || `https://img.youtube.com/vi/${id}/mqdefault.jpg` }];
     });
+    const checks=await checkVideos(items.map(v=>v.id));
+    for(const item of items){item.embedStatus=checks[item.id]?.embedStatus||'unknown';item.embedReason=checks[item.id]?.reason}
+    items.sort((a,b)=>Number(a.embedStatus==='blocked')-Number(b.embedStatus==='blocked'));
     if (cache.size > 300) cache.clear();
     cache.set(cacheKey, { items, expires: Date.now() + CACHE_MS });
     return NextResponse.json({ items, cached: false });

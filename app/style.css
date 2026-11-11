@@ -63,3 +63,5 @@
 .screen:fullscreen .side-carousel.carousel-reset .yt-layer,.screen:-webkit-full-screen .side-carousel.carousel-reset .yt-layer{transition:none!important}
 .screen:fullscreen .side-carousel .yt-mount,.screen:fullscreen .side-carousel iframe,.screen:-webkit-full-screen .side-carousel .yt-mount,.screen:-webkit-full-screen .side-carousel iframe{width:100%!important;min-width:100%!important;height:100%!important;min-height:100%!important}
 .screen:fullscreen .side-carousel .video-card-label{font-size:16px;padding:10px 15px;bottom:22px;left:22px}
+
+.embed-warning{display:block;color:#ff9b9b!important;font-size:12px;margin-top:5px}.embed-unknown{display:block;color:#e7c987!important;font-size:12px;margin-top:4px}

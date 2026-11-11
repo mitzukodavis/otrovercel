@@ -1,0 +1,12 @@
+JAM VERCEL - Comprobación de compatibilidad y carrusel
+
+- YouTube Data API v3 videos.list (part=snippet,status) verifica status.embeddable para videos buscados y enlaces pegados.
+- El costo de videos.list es normalmente 1 unidad por solicitud de hasta 50 IDs; la búsqueda search.list mantiene su costo de 100 unidades por solicitud.
+- Videos con embeddable=false aparecen con advertencia y al final de la cola.
+- Si YouTube rechaza la reproducción durante la ejecución, se marca como bloqueado y se intenta continuar.
+- El carrusel prepara el siguiente video elegible cuando cambia la cola y la canción actual se reproduce.
+- No se puede eludir el bloqueo de incrustación de YouTube abriendo un navegador dentro de la aplicación. El enlace Abrir en YouTube sigue disponible.
+- status.embeddable no garantiza que un video sea reproducible en todos los países, cuentas o navegadores.
+- Se necesita YOUTUBE_API_KEY en Vercel, nunca dentro del ZIP.
+
+NOTA: La app mantiene su almacenamiento Vercel Blob; no se ha probado el despliegue en un navegador real.

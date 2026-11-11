@@ -1,5 +1,5 @@
 import { list, put } from '@vercel/blob';
-export type Video={id:string;title:string;addedBy:string;uid:string};
+export type Video={id:string;title:string;addedBy:string;uid:string;embedStatus?:'allowed'|'blocked'|'unknown';embedReason?:string};
 export type PlayedVideo=Video & {playedAt:number};
 export type Room={code:string;history?:PlayedVideo[];queue:Video[];index:number;hostKey:string;hostSeen:number;playing:boolean;updatedAt:number;version:number};
 const path=(code:string)=>`jam-rooms/${code}.json`;
