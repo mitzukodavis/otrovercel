@@ -12,7 +12,7 @@ export async function checkVideos(ids:string[]):Promise<Record<string,VideoCheck
   if(!r.ok)throw Error('YouTube metadata HTTP '+r.status);
   const data=await r.json();const found=new Map<string,any>((data.items||[]).map((v:any)=>[v.id,v]));
   for(const id of batch){const item=found.get(id);const value:VideoCheck=!item?{id,embedStatus:'blocked',reason:'Video no disponible o no público'}:{id,title:item.snippet?.title,embedStatus:item.status?.embeddable===false?'blocked':item.status?.embeddable===true?'allowed':'unknown',reason:item.status?.embeddable===false?'YouTube no permite reproducirlo en reproductores integrados':undefined};result[id]=value;cache.set(id,{value,until:Date.now()+3600000})}
- }catch{for(const id of batch)result[id]={id,embedStatus:'unknown',reason:'No se pudo verificar la reproducción'}}}}
+ }catch{for(const id of batch)result[id]={id,embedStatus:'unknown',reason:'No se pudo verificar la reproducción'}}}
  }else for(const id of missing)result[id]={id,embedStatus:'unknown',reason:'Falta YOUTUBE_API_KEY'};
  return result;
 }
