@@ -6,7 +6,7 @@ export function valid(code:string){return /^[A-Z0-9]{6}$/.test(code)}
 export async function readRoom(code:string):Promise<Room|null>{
  const {blobs}=await list({prefix:path(code),limit:100});
  const blob=blobs.find(b=>b.pathname===path(code));if(!blob)return null;
- const r=await fetch(blob.url,{cache:'no-store'});if(!r.ok)throw new Error('No se pudo leer la sala');
+ const r=await fetch(blob.url+'?v='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('No se pudo leer la sala');
  return await r.json() as Room;
 }
 export async function writeRoom(room:Room){room.updatedAt=Date.now();room.version=(room.version||0)+1;await put(path(room.code),JSON.stringify(room),{access:'public',addRandomSuffix:false,allowOverwrite:true,contentType:'application/json'});}

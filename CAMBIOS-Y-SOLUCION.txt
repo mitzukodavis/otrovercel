@@ -1,0 +1,15 @@
+JAM VERCEL - VERSION REVISADA
+
+1. Se eliminaron app/page.jsx y app/layout.jsx duplicados.
+2. Se actualizo @vercel/blob a la rama 2.x para la conexion moderna OIDC de Vercel.
+3. La API /api/room ahora muestra el motivo especifico si falla.
+4. Se evita reutilizar una lectura cacheada de la sala.
+
+INSTALACION:
+- Subir el CONTENIDO de esta carpeta a la raiz de GitHub (no subir el ZIP).
+- Borrar los archivos antiguos app/page.jsx y app/layout.jsx del repositorio.
+- En Vercel, comprobar Storage > jamvercel-blob > Projects > otrovercel y Production.
+- Esperar el despliegue automatico y probar Crear una sala.
+- Si sigue fallando, copiar el mensaje nuevo que aparezca: mostrara la causa concreta.
+
+NOTA: Esta version no se ha podido compilar ni probar en un despliegue real.
